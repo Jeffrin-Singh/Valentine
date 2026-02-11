@@ -81,7 +81,6 @@
         }
         .footer-credits a:hover { color: var(--primary-pink); }
 
-        /* THE MESSAGE ELEMENT */
         #footerMsg { 
             display: none; 
             margin-top: 15px; 
@@ -141,7 +140,7 @@
         <button onclick="copyToClipboard()" style="background: #4caf50; color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer;">Copy Link 📋</button>
     </div>
 
-    <!-- <div id="footerMsg">jeffrin know your crush</div> -->
+    <div id="footerMsg">jeffrin know your crush</div>
 
     <div class="footer-credits">
         Created by <a href="https://jeffrin-portfolio.vercel.app/" target="_blank">jeffrin</a>
@@ -203,9 +202,12 @@
 
             if (error) throw error;
 
-            // Success Logic
-            document.getElementById("footerMsg").style.display = "block";
-            document.getElementById("genCat").style.transform = "scale(1.2)";
+            // Safety Check: Only change style if element exists
+            const msg = document.getElementById("footerMsg");
+            if (msg) msg.style.display = "block";
+            
+            const cat = document.getElementById("genCat");
+            if (cat) cat.style.transform = "scale(1.2)";
             
             const baseUrl = window.location.origin + window.location.pathname;
             const finalUrl = `${baseUrl}?from=${encodeURIComponent(fromVal)}&to=${encodeURIComponent(toVal)}`;
@@ -215,8 +217,8 @@
             btn.innerText = "Link Ready! ✅";
             
         } catch (error) {
-            console.error("Error detected:", error);
-            alert("Connection Error: Check if Supabase RLS is enabled.");
+            console.error("Error:", error);
+            alert("Connection error: " + error.message);
             btn.innerText = "✨ Generate Link";
         }
     }
@@ -242,7 +244,7 @@
         document.getElementById("successSection").style.display = "block";
     }
 
-    // Large Heart Animation
+    // Larger Heart Animation
     setInterval(() => {
         const heart = document.createElement("div");
         heart.classList.add("heart");
