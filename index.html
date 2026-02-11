@@ -26,7 +26,7 @@
             min-height: 100vh;
             margin: 0;
             flex-direction: column;
-            overflow: hidden; /* Prevents scrollbars from falling hearts */
+            overflow: hidden;
         }
 
         .container {
@@ -39,6 +39,7 @@
             text-align: center;
             position: relative;
             z-index: 10;
+            transition: all 0.3s ease;
         }
 
         /* --- CSS CAT FACE --- */
@@ -48,6 +49,7 @@
             background: #fff;
             margin: 0 auto 10px;
             position: relative;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .cat-ear-left, .cat-ear-right {
             width: 0; height: 0;
@@ -72,7 +74,6 @@
             color: var(--light-pink);
             letter-spacing: 0.5px;
         }
-
         .footer-credits a {
             color: #4a90e2;
             text-decoration: none;
@@ -80,24 +81,21 @@
             position: relative;
             transition: color 0.3s ease;
         }
+        .footer-credits a:hover { color: var(--primary-pink); }
 
-        .footer-credits a:hover {
-            color: var(--primary-pink);
+        #footerMsg { 
+            display: none; 
+            margin-top: 15px; 
+            color: var(--primary-pink); 
+            font-weight: bold; 
+            font-size: 14px;
+            animation: pulse 1.5s infinite;
         }
 
-        .footer-credits a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 1.5px;
-            bottom: -2px;
-            left: 0;
-            background-color: var(--primary-pink);
-            transition: width 0.3s ease;
-        }
-
-        .footer-credits a:hover::after {
-            width: 100%;
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
 
         /* --- UI ELEMENTS --- */
@@ -105,39 +103,39 @@
         .subtitle { color: var(--light-pink); font-weight: 600; font-size: 14px; margin-bottom: 25px; display: block; }
         .input-group { text-align: left; margin-bottom: 15px; }
         label { display: block; font-weight: 600; color: var(--text-gray); margin-bottom: 6px; font-size: 14px; }
-        input { width: 100%; padding: 14px; border: 2px solid #fff0f3; border-radius: 15px; box-sizing: border-box; outline: none; font-size: 15px; }
+        input { width: 100%; padding: 14px; border: 2px solid #fff0f3; border-radius: 15px; box-sizing: border-box; outline: none; font-size: 15px; transition: border 0.3s; }
+        input:focus { border-color: var(--border-color); }
         
         button {
             background: linear-gradient(90deg, #ff007f, #ff1493);
             color: white; border: none; padding: 15px; width: 100%; border-radius: 18px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.2);
+            transition: transform 0.2s;
         }
+        button:active { transform: scale(0.98); }
 
         .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
         .btn-group button { width: auto; padding: 12px 30px; }
         #noBtn { background: #999; position: relative; }
 
         #copySection { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 15px; border: 1px dashed var(--light-pink); }
-        #footerMsg { display: none; margin-top: 15px; color: var(--primary-pink); font-weight: bold; font-size: 12px; }
         
-        /* UPDATED HEART CSS */
         .heart { 
             position: absolute; 
             color: var(--primary-pink); 
-            top: -100px; /* Start higher to avoid popping in */
+            top: -100px;
             z-index: 1; 
             animation: fall linear forwards; 
             user-select: none;
             pointer-events: none;
         }
-        @keyframes fall { 
-            to { transform: translateY(120vh) rotate(360deg); } 
-        }
+        @keyframes fall { to { transform: translateY(120vh) rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div id="formSection" class="container">
-    <div class="cat-face">
+    <div class="cat-face" id="genCat">
         <div class="cat-ear-left"></div><div class="cat-ear-right"></div>
         <div class="cat-eyes"><div class="cat-eye"></div><div class="cat-eye"></div></div>
         <div class="cat-nose"></div><div class="cat-blush-left"></div><div class="cat-blush-right"></div>
@@ -147,10 +145,14 @@
     <div class="input-group"><label>Your Name:</label><input type="text" id="from" placeholder="e.g., John"></div>
     <div class="input-group"><label>Valentine Name:</label><input type="text" id="to" placeholder="e.g., Sarah"></div>
     <button onclick="generateLink()" id="genBtn">✨ Generate Link</button>
+    
     <div id="copySection" style="display:none;">
-        <div id="generatedUrl" style="word-break: break-all; font-size: 12px; margin-bottom: 10px; color: #666;"></div>
+        <div id="generatedUrl" style="word-break: break-all; font-size: 12px; margin-bottom: 10px; color: #666; background: #eee; padding: 10px; border-radius: 8px;"></div>
         <button onclick="copyToClipboard()" style="background: #4caf50; color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer;">Copy Link 📋</button>
     </div>
+
+    <!-- <div id="footerMsg">jeffrin know your crush</div> -->
+
     <div class="footer-credits">
         Created by <a href="https://jeffrin-portfolio.vercel.app/" target="_blank">jeffrin</a>
     </div>
@@ -175,7 +177,7 @@
 </div>
 
 <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
     const supabase = createClient(
         "https://azpvknhroopexjerzctp.supabase.co",
@@ -189,7 +191,7 @@
     if (fromParam && toParam) {
         document.getElementById("formSection").style.display = "none";
         document.getElementById("loveSection").style.display = "block";
-        document.getElementById("proposalText").innerText = `${toParam}, will you be my Valentine?`;
+        document.getElementById("proposalText").innerText = `${decodeURIComponent(toParam)}, will you be my Valentine?`;
     }
 
     window.generateLink = async function() {
@@ -204,23 +206,29 @@
         const btn = document.getElementById("genBtn");
         btn.innerText = "Saving...";
 
-        const { error } = await supabase
-            .from("valentines")
-            .insert([{ from_name: fromVal, to_name: toVal }]);
+        try {
+            const { error } = await supabase
+                .from("valentines")
+                .insert([{ from_name: fromVal, to_name: toVal }]);
 
-        if (error) {
-            alert("Database Error.");
+            if (error) throw error;
+
+            // Success UI
+            document.getElementById("footerMsg").style.display = "block";
+            document.getElementById("genCat").style.transform = "scale(1.2) rotate(10deg)";
+            
+            const baseUrl = window.location.origin + window.location.pathname;
+            const finalUrl = `${baseUrl}?from=${encodeURIComponent(fromVal)}&to=${encodeURIComponent(toVal)}`;
+            
+            document.getElementById("generatedUrl").innerText = finalUrl;
+            document.getElementById("copySection").style.display = "block";
+            btn.innerText = "Link Ready! ✅";
+            
+        } catch (error) {
+            console.error("Supabase Error:", error);
+            alert("Error: " + error.message);
             btn.innerText = "✨ Generate Link";
-            return;
         }
-
-        document.getElementById("footerMsg").style.display = "block";
-        const baseUrl = window.location.origin + window.location.pathname;
-        const finalUrl = `${baseUrl}?from=${encodeURIComponent(fromVal)}&to=${encodeURIComponent(toVal)}`;
-        
-        document.getElementById("generatedUrl").innerText = finalUrl;
-        document.getElementById("copySection").style.display = "block";
-        btn.innerText = "Link Ready! ✅";
     }
 
     window.copyToClipboard = function() {
@@ -244,20 +252,16 @@
         document.getElementById("successSection").style.display = "block";
     }
 
-    // UPDATED JAVASCRIPT FOR LARGER HEARTS
+    // Larger Hearts
     setInterval(() => {
         const heart = document.createElement("div");
         heart.classList.add("heart");
         heart.innerHTML = "❤️";
-        
-        // Randomize size between 20px and 50px
         const size = Math.random() * 30 + 20; 
         heart.style.fontSize = size + "px";
-        
         heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = (Math.random() * 3 + 3) + "s"; // Slower fall for bigger hearts
-        heart.style.opacity = Math.random() * 0.5 + 0.3; // Random transparency
-        
+        heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
+        heart.style.opacity = Math.random() * 0.5 + 0.3;
         document.body.appendChild(heart);
         setTimeout(() => heart.remove(), 6000);
     }, 450);
