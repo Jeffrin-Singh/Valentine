@@ -133,11 +133,14 @@
     <span class="subtitle">Create personalized Valentine's Day proposals!</span>
     <div class="input-group"><label>Your Name:</label><input type="text" id="from" placeholder="e.g., John"></div>
     <div class="input-group"><label>Valentine Name:</label><input type="text" id="to" placeholder="e.g., Sarah"></div>
+    
     <button onclick="generateLink()" id="genBtn">✨ Generate Link</button>
     
     <div id="copySection" style="display:none;">
         <div id="generatedUrl" style="word-break: break-all; font-size: 12px; margin-bottom: 10px; color: #666; background: #eee; padding: 10px; border-radius: 8px;"></div>
-        <button onclick="copyToClipboard()" style="background: #4caf50; color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer;">Copy Link 📋</button>
+        <button onclick="copyToClipboard()" style="background: #4caf50; color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer; margin-bottom: 10px;">Copy Link 📋</button>
+        
+        <button onclick="previewProposal()" style="background: #4a90e2; color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer;">👀 Preview Proposal</button>
     </div>
 
     <!-- <div id="footerMsg">jeffrin know your crush</div> -->
@@ -202,7 +205,6 @@
 
             if (error) throw error;
 
-            // Safety Check: Only change style if element exists
             const msg = document.getElementById("footerMsg");
             if (msg) msg.style.display = "block";
             
@@ -230,6 +232,13 @@
         });
     }
 
+    window.previewProposal = function() {
+        const toVal = document.getElementById("to").value.trim();
+        document.getElementById("formSection").style.display = "none";
+        document.getElementById("loveSection").style.display = "block";
+        document.getElementById("proposalText").innerText = `${toVal}, will you be my Valentine?`;
+    }
+
     window.moveButton = function() {
         const noBtn = document.getElementById("noBtn");
         const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
@@ -244,7 +253,6 @@
         document.getElementById("successSection").style.display = "block";
     }
 
-    // Larger Heart Animation
     setInterval(() => {
         const heart = document.createElement("div");
         heart.classList.add("heart");
